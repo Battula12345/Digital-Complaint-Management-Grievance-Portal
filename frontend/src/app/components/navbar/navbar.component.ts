@@ -37,27 +37,32 @@ import { AuthService } from '../../services/auth.service';
       position: sticky;
       top: 0;
       z-index: 1000;
-      padding: 0 24px;
+      padding: 0 32px;
       height: 70px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     .toolbar-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
     }
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .brand:hover {
+      opacity: 0.9;
     }
     .logo-icon {
       font-size: 32px;
       width: 32px;
       height: 32px;
-      color: white;
+      color: #0ea5e9;
     }
     .brand-text {
       font-size: 22px;
@@ -74,17 +79,18 @@ import { AuthService } from '../../services/auth.service';
       display: flex;
       align-items: center;
       gap: 12px;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.1);
       padding: 6px 16px 6px 6px;
       border-radius: 30px;
       backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
     }
     .avatar {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: white;
-      color: #6366f1;
+      background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -103,27 +109,39 @@ import { AuthService } from '../../services/auth.service';
     }
     .user-role {
       font-size: 11px;
-      color: rgba(255,255,255,0.8);
+      color: rgba(255,255,255,0.7);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .logout-btn {
-      color: white !important;
+      color: rgba(255,255,255,0.8) !important;
       transition: all 0.2s;
     }
     .logout-btn:hover {
       background: rgba(255,255,255,0.1) !important;
+      color: white !important;
     }
     .nav-btn {
-      color: white !important;
+      color: rgba(255,255,255,0.9) !important;
       font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-btn:hover {
+      color: white !important;
     }
     .register-btn {
-      background: white !important;
-      color: #6366f1 !important;
+      background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%) !important;
+      color: white !important;
       font-weight: 600 !important;
-      border-radius: 20px !important;
-      padding: 0 20px !important;
+      border-radius: 24px !important;
+      padding: 0 24px !important;
+      height: 40px !important;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+      transition: all 0.3s ease !important;
+    }
+    .register-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4) !important;
     }
   `]
 })

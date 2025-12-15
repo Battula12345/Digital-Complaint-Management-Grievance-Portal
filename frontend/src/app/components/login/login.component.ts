@@ -7,61 +7,87 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-login',
   template: `
     <div class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <div class="icon-wrapper">
-            <mat-icon>login</mat-icon>
+      <div class="auth-left">
+        <div class="glass-card">
+          <div class="auth-header">
+            <div class="icon-wrapper">
+              <mat-icon>rocket_launch</mat-icon>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Enter your credentials to access your account</p>
           </div>
-          <h1>Welcome Back</h1>
-          <p>Sign in to continue to your dashboard</p>
-        </div>
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Email Address</mat-label>
-            <mat-icon matPrefix>email</mat-icon>
-            <input matInput type="email" formControlName="email" placeholder="you@example.com">
-            <mat-error>Enter a valid email</mat-error>
-          </mat-form-field>
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email Address</mat-label>
+              <mat-icon matPrefix class="field-icon">alternate_email</mat-icon>
+              <input matInput type="email" formControlName="email" placeholder="hello@example.com">
+              <mat-error>Enter a valid email</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Password</mat-label>
-            <mat-icon matPrefix>lock</mat-icon>
-            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
-              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <mat-icon matPrefix class="field-icon">key</mat-icon>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+              <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" class="toggle-btn">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error>Password is required</mat-error>
+            </mat-form-field>
+
+            <div *ngIf="error" class="error-message">
+              <mat-icon>warning_amber</mat-icon> {{ error }}
+            </div>
+
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading" class="submit-btn">
+              <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+              <span *ngIf="!loading">
+                Sign In
+                <mat-icon>arrow_forward</mat-icon>
+              </span>
             </button>
-            <mat-error>Password is required</mat-error>
-          </mat-form-field>
+          </form>
 
-          <div *ngIf="error" class="error-message">
-            <mat-icon>error</mat-icon> {{ error }}
+          <div class="auth-footer">
+            <p>Don't have an account? <a routerLink="/register">Create Account</a></p>
           </div>
-
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading" class="full-width submit-btn">
-            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-            <span *ngIf="!loading">Sign In</span>
-          </button>
-        </form>
-
-        <div class="auth-footer">
-          <p>Don't have an account? <a routerLink="/register">Create one</a></p>
         </div>
       </div>
 
-      <div class="auth-illustration">
+      <div class="auth-right">
+        <div class="floating-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
+        </div>
         <div class="illustration-content">
-          <mat-icon class="big-icon">support_agent</mat-icon>
+          <div class="logo-badge">
+            <mat-icon>hub</mat-icon>
+          </div>
           <h2>Grievance Portal</h2>
-          <p>Streamlined complaint management for organizations</p>
-          <div class="stats">
-            <div class="stat">
-              <span class="stat-number">24/7</span>
-              <span class="stat-label">Support Available</span>
+          <p class="tagline">Modern complaint management platform</p>
+          
+          <div class="feature-cards">
+            <div class="feature-card">
+              <mat-icon>speed</mat-icon>
+              <div>
+                <strong>Lightning Fast</strong>
+                <span>Quick resolution times</span>
+              </div>
             </div>
-            <div class="stat">
-              <span class="stat-number">Fast</span>
-              <span class="stat-label">Resolution Time</span>
+            <div class="feature-card">
+              <mat-icon>shield</mat-icon>
+              <div>
+                <strong>Secure</strong>
+                <span>Enterprise-grade security</span>
+              </div>
+            </div>
+            <div class="feature-card">
+              <mat-icon>insights</mat-icon>
+              <div>
+                <strong>Analytics</strong>
+                <span>Real-time tracking</span>
+              </div>
             </div>
           </div>
         </div>
@@ -69,117 +95,289 @@ import { AuthService } from '../../services/auth.service';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+    }
     .auth-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
       min-height: calc(100vh - 70px);
+      background: #f8fafc;
     }
-    .auth-card {
+    .auth-left {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      padding: 48px;
+      padding: 40px;
+    }
+    .glass-card {
       background: white;
+      border-radius: 24px;
+      padding: 48px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
     .auth-header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
     .icon-wrapper {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a855f7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 16px;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
     .icon-wrapper mat-icon {
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
       color: white;
     }
     .auth-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #111827;
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin: 0 0 8px;
     }
     .auth-header p {
-      color: #6b7280;
+      color: #64748b;
       margin: 0;
+      font-size: 15px;
     }
     form {
-      max-width: 400px;
-      margin: 0 auto;
       width: 100%;
     }
+    .full-width {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .field-icon {
+      color: #94a3b8;
+      margin-right: 12px;
+    }
+    .full-width:focus-within .field-icon {
+      color: #6366f1;
+    }
+    ::ng-deep .mat-mdc-form-field-icon-prefix {
+      padding: 0 8px 0 12px !important;
+    }
+    ::ng-deep .mdc-notched-outline__leading,
+    ::ng-deep .mdc-notched-outline__notch,
+    ::ng-deep .mdc-notched-outline__trailing {
+      border-color: #e2e8f0 !important;
+    }
+    .toggle-btn {
+      color: #94a3b8;
+    }
     .submit-btn {
-      margin-top: 16px;
-      height: 48px !important;
+      width: 100%;
+      height: 52px !important;
+      border-radius: 14px !important;
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a855f7 100%) !important;
+      color: white !important;
+      margin-top: 8px;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.5) !important;
+    }
+    .submit-btn:hover:not([disabled]) {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 50px -10px rgba(99, 102, 241, 0.6) !important;
+    }
+    .submit-btn span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .submit-btn mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
     .auth-footer {
       text-align: center;
-      margin-top: 24px;
+      margin-top: 28px;
     }
     .auth-footer p {
-      color: #6b7280;
+      color: #64748b;
+      font-size: 14px;
     }
-    .auth-illustration {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    .auth-footer a {
+      color: #6366f1;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .auth-footer a:hover {
+      color: #4f46e5;
+    }
+    .auth-right {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .floating-shapes {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.5;
+    }
+    .shape-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      top: -100px;
+      right: -100px;
+      animation: float 8s ease-in-out infinite;
+    }
+    .shape-2 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      bottom: -50px;
+      left: -50px;
+      animation: float 6s ease-in-out infinite reverse;
+    }
+    .shape-3 {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #10b981, #0ea5e9);
+      top: 50%;
+      left: 50%;
+      animation: float 7s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(30px, 30px) rotate(10deg); }
     }
     .illustration-content {
       text-align: center;
       color: white;
+      position: relative;
+      z-index: 1;
     }
-    .big-icon {
-      font-size: 80px;
-      width: 80px;
-      height: 80px;
-      opacity: 0.9;
+    .logo-badge {
+      width: 88px;
+      height: 88px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
     }
-    .illustration-content h2 {
-      font-size: 36px;
-      font-weight: 700;
-      margin: 24px 0 12px;
+    .logo-badge mat-icon {
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
       color: white;
     }
-    .illustration-content > p {
-      font-size: 16px;
-      opacity: 0.9;
+    .illustration-content h2 {
+      font-size: 40px;
+      font-weight: 800;
+      margin: 0 0 12px;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .stats {
+    .tagline {
+      font-size: 17px;
+      color: #94a3b8;
+      margin: 0 0 40px;
+    }
+    .feature-cards {
       display: flex;
-      gap: 40px;
-      margin-top: 40px;
-      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 280px;
+      margin: 0 auto;
     }
-    .stat {
-      text-align: center;
+    .feature-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      text-align: left;
+      transition: all 0.3s ease;
     }
-    .stat-number {
-      display: block;
-      font-size: 36px;
-      font-weight: 700;
+    .feature-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(8px);
     }
-    .stat-label {
+    .feature-card mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: #0ea5e9;
+    }
+    .feature-card div {
+      display: flex;
+      flex-direction: column;
+    }
+    .feature-card strong {
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+    }
+    .feature-card span {
       font-size: 13px;
-      opacity: 0.8;
+      color: #94a3b8;
     }
     .error-message {
       display: flex;
       align-items: center;
       gap: 8px;
+      padding: 12px 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      color: #dc2626;
+      font-size: 14px;
+      margin-bottom: 16px;
     }
-    @media (max-width: 900px) {
+    .error-message mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+    @media (max-width: 1024px) {
       .auth-container { grid-template-columns: 1fr; }
-      .auth-illustration { display: none; }
+      .auth-right { display: none; }
+      .auth-left { padding: 24px; }
+      .glass-card { padding: 32px; }
     }
   `]
 })

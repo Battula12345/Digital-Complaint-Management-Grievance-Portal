@@ -7,215 +7,432 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-registration',
   template: `
     <div class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <div class="icon-wrapper">
-            <mat-icon>person_add</mat-icon>
-          </div>
-          <h1>Create Account</h1>
-          <p>Join Grievance Portal to submit and track complaints</p>
+      <div class="auth-left">
+        <div class="floating-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
         </div>
-
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Full Name</mat-label>
-            <mat-icon matPrefix>person</mat-icon>
-            <input matInput formControlName="name" placeholder="Enter your name">
-            <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Email Address</mat-label>
-            <mat-icon matPrefix>email</mat-icon>
-            <input matInput type="email" formControlName="email" placeholder="you@example.com">
-            <mat-error *ngIf="form.get('email')?.hasError('email')">Enter a valid email</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Password</mat-label>
-            <mat-icon matPrefix>lock</mat-icon>
-            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
-              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-            <mat-error *ngIf="form.get('password')?.hasError('minlength')">Minimum 6 characters</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Select Role</mat-label>
-            <mat-icon matPrefix>badge</mat-icon>
-            <mat-select formControlName="role">
-              <mat-option value="User">
-                <mat-icon class="option-icon">person</mat-icon> User - Submit complaints
-              </mat-option>
-              <mat-option value="Staff">
-                <mat-icon class="option-icon">engineering</mat-icon> Staff - Handle complaints
-              </mat-option>
-              <mat-option value="Admin">
-                <mat-icon class="option-icon">admin_panel_settings</mat-icon> Admin - Manage system
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Contact Info (Optional)</mat-label>
-            <mat-icon matPrefix>phone</mat-icon>
-            <input matInput formControlName="contact_info" placeholder="Phone number">
-          </mat-form-field>
-
-          <div *ngIf="error" class="error-message">
-            <mat-icon>error</mat-icon> {{ error }}
+        <div class="illustration-content">
+          <div class="logo-badge">
+            <mat-icon>diversity_3</mat-icon>
           </div>
-          <div *ngIf="success" class="success-message">
-            <mat-icon>check_circle</mat-icon> {{ success }}
+          <h2>Join Our Community</h2>
+          <p class="tagline">Start your journey with us today</p>
+          
+          <div class="steps">
+            <div class="step" [class.active]="currentStep >= 1">
+              <div class="step-icon"><mat-icon>person_add</mat-icon></div>
+              <div class="step-info">
+                <strong>Create Account</strong>
+                <span>Fill in your details</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" [class.active]="currentStep >= 2">
+              <div class="step-icon"><mat-icon>verified_user</mat-icon></div>
+              <div class="step-info">
+                <strong>Verify Email</strong>
+                <span>Confirm your identity</span>
+              </div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" [class.active]="currentStep >= 3">
+              <div class="step-icon"><mat-icon>celebration</mat-icon></div>
+              <div class="step-info">
+                <strong>Get Started</strong>
+                <span>Submit complaints</span>
+              </div>
+            </div>
           </div>
-
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading" class="full-width submit-btn">
-            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-            <span *ngIf="!loading">Create Account</span>
-          </button>
-        </form>
-
-        <div class="auth-footer">
-          <p>Already have an account? <a routerLink="/login">Sign in</a></p>
         </div>
       </div>
 
-      <div class="auth-illustration">
-        <div class="illustration-content">
-          <mat-icon class="big-icon">support_agent</mat-icon>
-          <h2>Welcome to Grievance Portal</h2>
-          <p>Your one-stop solution for complaint management and resolution tracking</p>
-          <div class="features">
-            <div class="feature"><mat-icon>check_circle</mat-icon> Easy complaint submission</div>
-            <div class="feature"><mat-icon>check_circle</mat-icon> Real-time status tracking</div>
-            <div class="feature"><mat-icon>check_circle</mat-icon> Quick resolution</div>
+      <div class="auth-right">
+        <div class="glass-card">
+          <div class="auth-header">
+            <div class="icon-wrapper">
+              <mat-icon>auto_awesome</mat-icon>
+            </div>
+            <h1>Create Account</h1>
+            <p>Join thousands of users managing complaints efficiently</p>
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Full Name</mat-label>
+              <mat-icon matPrefix class="field-icon">badge</mat-icon>
+              <input matInput formControlName="name" placeholder="John Doe">
+              <mat-error>Name is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email Address</mat-label>
+              <mat-icon matPrefix class="field-icon">alternate_email</mat-icon>
+              <input matInput type="email" formControlName="email" placeholder="hello@example.com">
+              <mat-error>Enter a valid email</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <mat-icon matPrefix class="field-icon">key</mat-icon>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+              <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" class="toggle-btn">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error>Minimum 6 characters</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Select Role</mat-label>
+              <mat-icon matPrefix class="field-icon">work</mat-icon>
+              <mat-select formControlName="role">
+                <mat-option value="User">User - Submit complaints</mat-option>
+                <mat-option value="Staff">Staff - Handle complaints</mat-option>
+                <mat-option value="Admin">Admin - Manage system</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Phone (Optional)</mat-label>
+              <mat-icon matPrefix class="field-icon">call</mat-icon>
+              <input matInput formControlName="contact_info" placeholder="+1 234 567 8900">
+            </mat-form-field>
+
+            <div *ngIf="error" class="error-message">
+              <mat-icon>warning_amber</mat-icon> {{ error }}
+            </div>
+            <div *ngIf="success" class="success-message">
+              <mat-icon>check_circle</mat-icon> {{ success }}
+            </div>
+
+            <button mat-flat-button type="submit" [disabled]="form.invalid || loading" class="submit-btn">
+              <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+              <span *ngIf="!loading">
+                Create Account
+                <mat-icon>arrow_forward</mat-icon>
+              </span>
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            <p>Already have an account? <a routerLink="/login">Sign In</a></p>
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+    }
     .auth-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
       min-height: calc(100vh - 70px);
+      background: #f8fafc;
     }
-    .auth-card {
+    .auth-left {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       display: flex;
-      flex-direction: column;
+      align-items: center;
       justify-content: center;
       padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .floating-shapes {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.5;
+    }
+    .shape-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, #10b981, #0ea5e9);
+      top: -100px;
+      left: -100px;
+      animation: float 8s ease-in-out infinite;
+    }
+    .shape-2 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      bottom: -50px;
+      right: -50px;
+      animation: float 6s ease-in-out infinite reverse;
+    }
+    .shape-3 {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      top: 50%;
+      right: 30%;
+      animation: float 7s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(30px, 30px) rotate(10deg); }
+    }
+    .illustration-content {
+      text-align: center;
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+    .logo-badge {
+      width: 88px;
+      height: 88px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .logo-badge mat-icon {
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
+      color: white;
+    }
+    .illustration-content h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin: 0 0 12px;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tagline {
+      font-size: 17px;
+      color: #94a3b8;
+      margin: 0 0 48px;
+    }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      opacity: 0.5;
+    }
+    .step.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      opacity: 1;
+    }
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #0ea5e9 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-icon mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      color: white;
+    }
+    .step-info {
+      text-align: left;
+    }
+    .step-info strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+    }
+    .step-info span {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .step-line {
+      width: 2px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      margin-left: 37px;
+    }
+    .auth-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    .glass-card {
       background: white;
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
     .auth-header {
       text-align: center;
       margin-bottom: 32px;
     }
     .icon-wrapper {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #10b981 0%, #0ea5e9 50%, #6366f1 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 16px;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
     .icon-wrapper mat-icon {
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
       color: white;
     }
     .auth-header h1 {
       font-size: 28px;
-      font-weight: 700;
-      color: #111827;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin: 0 0 8px;
     }
     .auth-header p {
-      color: #6b7280;
+      color: #64748b;
       margin: 0;
+      font-size: 14px;
     }
     form {
-      max-width: 400px;
-      margin: 0 auto;
       width: 100%;
     }
-    .submit-btn {
-      margin-top: 16px;
-      height: 48px !important;
+    .full-width {
+      width: 100%;
+      margin-bottom: 4px;
     }
-    .submit-btn mat-spinner {
-      display: inline-block;
+    .field-icon {
+      color: #94a3b8;
+      margin-right: 12px;
+    }
+    .full-width:focus-within .field-icon {
+      color: #10b981;
+    }
+    ::ng-deep .mat-mdc-form-field-icon-prefix {
+      padding: 0 8px 0 12px !important;
+    }
+    ::ng-deep .mdc-notched-outline__leading,
+    ::ng-deep .mdc-notched-outline__notch,
+    ::ng-deep .mdc-notched-outline__trailing {
+      border-color: #e2e8f0 !important;
+    }
+    .toggle-btn {
+      color: #94a3b8;
+    }
+    .submit-btn {
+      width: 100%;
+      height: 52px !important;
+      border-radius: 14px !important;
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      background: linear-gradient(135deg, #10b981 0%, #0ea5e9 50%, #6366f1 100%) !important;
+      color: white !important;
+      margin-top: 8px;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.5) !important;
+    }
+    .submit-btn:hover:not([disabled]) {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 50px -10px rgba(16, 185, 129, 0.6) !important;
+    }
+    .submit-btn span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .submit-btn mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
     .auth-footer {
       text-align: center;
       margin-top: 24px;
     }
     .auth-footer p {
-      color: #6b7280;
+      color: #64748b;
+      font-size: 14px;
     }
-    .auth-illustration {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    .auth-footer a {
+      color: #10b981;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .auth-footer a:hover {
+      color: #059669;
+    }
+    .error-message {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 48px;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      color: #dc2626;
+      font-size: 14px;
+      margin-bottom: 16px;
     }
-    .illustration-content {
-      text-align: center;
-      color: white;
-    }
-    .big-icon {
-      font-size: 80px;
-      width: 80px;
-      height: 80px;
-      opacity: 0.9;
-    }
-    .illustration-content h2 {
-      font-size: 32px;
-      font-weight: 700;
-      margin: 24px 0 12px;
-      color: white;
-    }
-    .illustration-content > p {
-      font-size: 16px;
-      opacity: 0.9;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-    .features {
-      margin-top: 32px;
-      text-align: left;
-      display: inline-block;
-    }
-    .feature {
+    .success-message {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin: 12px 0;
-      font-size: 15px;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      color: #16a34a;
+      font-size: 14px;
+      margin-bottom: 16px;
     }
-    .feature mat-icon {
+    .error-message mat-icon, .success-message mat-icon {
       font-size: 20px;
       width: 20px;
       height: 20px;
     }
-    .option-icon {
-      vertical-align: middle;
-      margin-right: 8px;
-      font-size: 20px;
-    }
-    .error-message, .success-message {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
       .auth-container { grid-template-columns: 1fr; }
-      .auth-illustration { display: none; }
+      .auth-left { display: none; }
+      .auth-right { padding: 24px; }
+      .glass-card { padding: 32px; }
     }
   `]
 })
@@ -225,6 +442,7 @@ export class RegistrationComponent {
   error = '';
   success = '';
   hidePassword = true;
+  currentStep = 1;
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.form = this.fb.group({
