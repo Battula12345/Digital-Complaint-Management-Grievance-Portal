@@ -130,7 +130,7 @@ import { AuthService } from '../../services/auth.service';
       display: grid;
       grid-template-columns: 1fr 1fr;
       min-height: calc(100vh - 70px);
-      background: #f8fafc;
+      background: #ffffffff;
     }
     .auth-left {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -140,6 +140,15 @@ import { AuthService } from '../../services/auth.service';
       padding: 48px;
       position: relative;
       overflow: hidden;
+    }
+      .glass-card {
+      background: white;
+      border-radius: 24px;
+      padding: 48px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 50px -12px rgba(26, 255, 0, 0.58);
+      border: 1px solid rgba(26, 214, 51, 0.5);
     }
     .floating-shapes {
       position: absolute;
@@ -288,7 +297,7 @@ import { AuthService } from '../../services/auth.service';
       width: 100%;
       max-width: 480px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(18, 231, 22, 0.84);
     }
     .auth-header {
       text-align: center;
@@ -350,7 +359,7 @@ import { AuthService } from '../../services/auth.service';
     ::ng-deep .mdc-notched-outline__leading,
     ::ng-deep .mdc-notched-outline__notch,
     ::ng-deep .mdc-notched-outline__trailing {
-      border-color: #e2e8f0 !important;
+      border-color: #16c61cff !important;
     }
     .toggle-btn {
       color: #94a3b8;
@@ -416,7 +425,7 @@ import { AuthService } from '../../services/auth.service';
       align-items: center;
       gap: 8px;
       padding: 12px 16px;
-      background: #f0fdf4;
+      background: #29d25bff;
       border: 1px solid #bbf7d0;
       border-radius: 12px;
       color: #16a34a;
@@ -434,6 +443,12 @@ import { AuthService } from '../../services/auth.service';
       .auth-right { padding: 24px; }
       .glass-card { padding: 32px; }
     }
+     input, select {
+  border: 1.5px solid #c7d2fe; /* light indigo/blue */
+  border-radius: 8px;
+}
+
+
   `]
 })
 export class RegistrationComponent {

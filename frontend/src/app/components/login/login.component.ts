@@ -102,7 +102,7 @@ import { AuthService } from '../../services/auth.service';
       display: grid;
       grid-template-columns: 1fr 1fr;
       min-height: calc(100vh - 70px);
-      background: #f8fafc;
+      background: #ffffffff;
     }
     .auth-left {
       display: flex;
@@ -116,8 +116,8 @@ import { AuthService } from '../../services/auth.service';
       padding: 48px;
       width: 100%;
       max-width: 440px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 25px 50px -12px rgba(0, 68, 255, 0.08);
+      border: 1px solid rgba(33, 36, 240, 0.5);
     }
     .auth-header {
       text-align: center;
@@ -179,7 +179,7 @@ import { AuthService } from '../../services/auth.service';
     ::ng-deep .mdc-notched-outline__leading,
     ::ng-deep .mdc-notched-outline__notch,
     ::ng-deep .mdc-notched-outline__trailing {
-      border-color: #e2e8f0 !important;
+      border-color: #618cc5ff !important;
     }
     .toggle-btn {
       color: #94a3b8;
@@ -267,7 +267,7 @@ import { AuthService } from '../../services/auth.service';
     .shape-3 {
       width: 200px;
       height: 200px;
-      background: linear-gradient(135deg, #10b981, #0ea5e9);
+      background: linear-gradient(135deg, #10b981, #095c82ff);
       top: 50%;
       left: 50%;
       animation: float 7s ease-in-out infinite;
@@ -304,7 +304,7 @@ import { AuthService } from '../../services/auth.service';
       font-size: 40px;
       font-weight: 800;
       margin: 0 0 12px;
-      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      background: linear-gradient(135deg, #0c6debff 0%, #83a1cbff 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -361,7 +361,7 @@ import { AuthService } from '../../services/auth.service';
       align-items: center;
       gap: 8px;
       padding: 12px 16px;
-      background: #fef2f2;
+      background: #0d8d04ff;
       border: 1px solid #fecaca;
       border-radius: 12px;
       color: #dc2626;
@@ -379,6 +379,19 @@ import { AuthService } from '../../services/auth.service';
       .auth-left { padding: 24px; }
       .glass-card { padding: 32px; }
     }
+      .signin-btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .signin-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(37, 28, 211, 0.4);
+}
+
+.signin-btn:active {
+  transform: scale(0.97);
+}
+
   `]
 })
 export class LoginComponent {
