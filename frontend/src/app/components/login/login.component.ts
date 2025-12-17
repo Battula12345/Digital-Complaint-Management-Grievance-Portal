@@ -102,7 +102,7 @@ import { AuthService } from '../../services/auth.service';
       display: grid;
       grid-template-columns: 1fr 1fr;
       min-height: calc(100vh - 70px);
-      background: #ffffffff;
+      background: #f8f8f8ff;
     }
     .auth-left {
       display: flex;
