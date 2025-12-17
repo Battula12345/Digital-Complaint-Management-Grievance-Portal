@@ -190,7 +190,7 @@ import { AuthService } from '../../services/auth.service';
       border-radius: 14px !important;
       font-size: 16px !important;
       font-weight: 600 !important;
-      background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a855f7 100%) !important;
+      background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a756f2ff 100%) !important;
       color: white !important;
       margin-top: 8px;
       transition: all 0.3s ease !important;
