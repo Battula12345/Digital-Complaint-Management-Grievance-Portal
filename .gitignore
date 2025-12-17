@@ -1,0 +1,102 @@
+# ============================================
+# FRONTEND (.gitignore for Angular)
+# ============================================
+
+# Dependencies
+frontend/node_modules/
+frontend/npm-debug.log
+frontend/yarn-error.log
+frontend/package-lock.json
+frontend/yarn.lock
+
+# Angular build output
+frontend/dist/
+frontend/.angular/
+frontend/out-tsc/
+frontend/bazel-out/
+
+# Angular CLI cache
+frontend/.angular/cache/
+
+# Development environment (Frontend)
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# ============================================
+# BACKEND (Node.js/Express) - IGNORED
+# ============================================
+
+# Entire backend folder - keep locally only
+/backend/
+
+# ============================================
+# IDE & EDITOR (Both)
+# ============================================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+*.iml
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/launch.json
+.vscode/settings.json
+.vscode/extensions.json
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# ============================================
+# TESTING
+# ============================================
+
+coverage/
+.nyc_output/
+test-results/
+
+# ============================================
+# TEMP & CACHE FILES
+# ============================================
+
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+
+# ============================================
+# OS FILES
+# ============================================
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# ============================================
+# SYSTEM FILES
+# ============================================
+
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================
+# MISC
+# ============================================
+
+.env.*.local
+config/local.js
