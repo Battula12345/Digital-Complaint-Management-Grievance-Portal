@@ -24,11 +24,22 @@ frontend/.env.local
 frontend/.env.*.local
 
 # ============================================
-# BACKEND (Node.js/Express) - IGNORED
+# BACKEND (Node.js/Express)
 # ============================================
 
-# Entire backend folder - keep locally only
-/backend/
+# Dependencies
+backend/node_modules/
+backend/npm-debug.log
+backend/yarn-error.log
+
+# Build output
+backend/dist/
+
+# Environment files (keep sensitive data local)
+backend/.env
+
+# Uploads folder
+backend/uploads/
 
 # ============================================
 # IDE & EDITOR (Both)
