@@ -20,7 +20,7 @@ const upload = multer({ storage });
 router.post('/', authenticate, authorize('User'), upload.single('attachment'), [
   body('title').notEmpty().withMessage('Title is required'),
   body('description').notEmpty().withMessage('Description is required'),
-  body('category').isIn(['plumbing', 'electrical', 'facility', 'other']).withMessage('Invalid category')
+  body('category').isIn(['plumbing', 'electrical', 'facility', 'other']).withMessage('Invalid Category')
 ], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
