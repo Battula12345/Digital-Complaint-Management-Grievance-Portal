@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ComplaintService } from '../../services/complaint.service';
 import { Complaint, Status } from '../../models';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-staff-dashboard',
@@ -195,7 +196,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                   </div>
                   <div class="info-item" *ngIf="c.contact_info">
                     <mat-icon>phone</mat-icon>
-                    <span>{{ c.contact_info }}</span>
+                    <a [href]="'tel:' + c.contact_info" class="phone-link">{{ c.contact_info }}</a>
                   </div>
                 </div>
                 <div class="info-row">
@@ -252,6 +253,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                 <span>Resolution Notes</span>
               </div>
               <p class="resolution-text">{{ c.resolution_notes }}</p>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="chat-section">
+              <app-chat [complaintId]="c.id"></app-chat>
             </div>
           </div>
         </div>
@@ -366,6 +372,31 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .info-row + .info-row { margin-top: 10px; }
     .info-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; }
     .info-item mat-icon { font-size: 16px; width: 16px; height: 16px; color: #059669; }
+
+    /* Location Section */
+    .location-section { background: #f0f9ff; border-radius: 12px; overflow: hidden; margin-top: 16px; border: 1px solid #bae6fd; }
+    .location-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; cursor: pointer; transition: background 0.2s; }
+    .location-header:hover { background: #e0f2fe; }
+    .location-header mat-icon { color: #0284c7; font-size: 18px; width: 18px; height: 18px; }
+    .location-header .location-info { flex: 1; }
+    .location-header .location-label { display: block; font-size: 11px; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    .location-header .location-address { display: block; font-size: 13px; color: #0c4a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .location-header .expand-icon { color: #64748b; }
+    .location-details { padding: 16px; background: #e0f2fe; }
+    .coords-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0369a1; margin-bottom: 12px; font-family: monospace; }
+    .coords-row mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    .location-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .map-btn, .directions-btn, .call-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+    .map-btn { background: #6366f1; color: white; }
+    .map-btn:hover { background: #4f46e5; }
+    .directions-btn { background: #0284c7; color: white; }
+    .directions-btn:hover { background: #0369a1; }
+    .call-btn { background: #10b981; color: white; }
+    .call-btn:hover { background: #059669; }
+    .map-btn mat-icon, .directions-btn mat-icon, .call-btn mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    
+    .phone-item .phone-link { color: #059669; text-decoration: none; font-weight: 500; }
+    .phone-item .phone-link:hover { text-decoration: underline; }
     
     /* Card Actions */
     .card-actions { padding: 0 24px 24px; }
@@ -390,6 +421,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .resolution-header mat-icon { font-size: 20px; width: 20px; height: 20px; color: #059669; }
     .resolution-header span { font-size: 13px; font-weight: 600; color: #047857; }
     .resolution-text { font-size: 14px; color: #065f46; margin: 0; line-height: 1.5; }
+
+    /* Chat Section */
+    .chat-section { padding: 0 24px 24px; }
     
     /* Responsive */
     @media (max-width: 1200px) {
@@ -408,13 +442,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   `]
 })
 export class StaffDashboardComponent implements OnInit {
-  complaints: (Complaint & { newStatus?: Status; notes?: string })[] = [];
+  complaints: (Complaint & { newStatus?: Status; notes?: string; showMap?: boolean })[] = [];
   loading = true;
   updating: number | null = null;
   activeFilter = 'all';
   today = new Date();
 
-  constructor(private complaintService: ComplaintService, private snackBar: MatSnackBar) {}
+  constructor(
+    private complaintService: ComplaintService, 
+    private snackBar: MatSnackBar,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit(): void {
     this.loadComplaints();
@@ -427,9 +465,19 @@ export class StaffDashboardComponent implements OnInit {
     });
   }
 
-  get filteredComplaints(): (Complaint & { newStatus?: Status; notes?: string })[] {
+  get filteredComplaints(): (Complaint & { newStatus?: Status; notes?: string; showMap?: boolean })[] {
     if (this.activeFilter === 'all') return this.complaints;
     return this.complaints.filter(c => c.status === this.activeFilter);
+  }
+
+  toggleMap(complaint: Complaint & { showMap?: boolean }): void {
+    complaint.showMap = !complaint.showMap;
+  }
+
+  getMapUrl(complaint: Complaint): SafeResourceUrl {
+    // Using OpenStreetMap embed which is more reliable
+    const url = `https://www.openstreetmap.org/export/embed.html?bbox=${complaint.longitude! - 0.005},${complaint.latitude! - 0.005},${complaint.longitude! + 0.005},${complaint.latitude! + 0.005}&layer=mapnik&marker=${complaint.latitude},${complaint.longitude}`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   getStatusCount(status: string): number {

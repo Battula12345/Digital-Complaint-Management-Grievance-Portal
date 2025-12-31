@@ -46,12 +46,74 @@ export const initDatabase = async () => {
       status ENUM('Open', 'Assigned', 'In-progress', 'Pending', 'On-hold', 'Rejected', 'Resolved', 'Closed') DEFAULT 'Open',
       attachments VARCHAR(500),
       resolution_notes TEXT,
+      feedback_rating INT CHECK (feedback_rating >= 1 AND feedback_rating <= 5),
+      feedback_comment TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (staff_id) REFERENCES users(id) ON DELETE SET NULL
     )
   `);
+
+  // FCM tokens table for push notifications
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS fcm_tokens (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL UNIQUE,
+      token TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Notifications table for notification history
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      body TEXT NOT NULL,
+      complaint_id INT,
+      type ENUM('status_change', 'assignment', 'feedback', 'system') DEFAULT 'system',
+      is_read BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (complaint_id) REFERENCES complaints(id) ON DELETE SET NULL
+    )
+  `);
+
+  // Chat messages table for in-app messaging
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      complaint_id INT NOT NULL,
+      sender_id INT NOT NULL,
+      message TEXT NOT NULL,
+      is_read BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (complaint_id) REFERENCES complaints(id) ON DELETE CASCADE,
+      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Add location columns to complaints if not exists
+  try {
+    await connection.query(`ALTER TABLE complaints ADD COLUMN latitude DECIMAL(10, 8) NULL`);
+    await connection.query(`ALTER TABLE complaints ADD COLUMN longitude DECIMAL(11, 8) NULL`);
+    await connection.query(`ALTER TABLE complaints ADD COLUMN location_address VARCHAR(500) NULL`);
+  } catch (e) {
+    // Columns may already exist
+  }
+
+  // Add address columns to users if not exists
+  try {
+    await connection.query(`ALTER TABLE users ADD COLUMN address VARCHAR(500) NULL`);
+    await connection.query(`ALTER TABLE users ADD COLUMN latitude DECIMAL(10, 8) NULL`);
+    await connection.query(`ALTER TABLE users ADD COLUMN longitude DECIMAL(11, 8) NULL`);
+  } catch (e) {
+    // Columns may already exist
+  }
 
   await connection.end();
   console.log('Database initialized successfully');

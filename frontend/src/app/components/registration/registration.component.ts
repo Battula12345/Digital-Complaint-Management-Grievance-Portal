@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-registration',
@@ -94,9 +95,9 @@ import { AuthService } from '../../services/auth.service';
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Phone (Optional)</mat-label>
+              <mat-label>Phone Number</mat-label>
               <mat-icon matPrefix class="field-icon">call</mat-icon>
-              <input matInput formControlName="contact_info" placeholder="+1 234 567 8900">
+              <input matInput formControlName="contact_info" placeholder="+91 9876543210">
             </mat-form-field>
 
             <div *ngIf="error" class="error-message">
@@ -437,6 +438,22 @@ import { AuthService } from '../../services/auth.service';
       width: 20px;
       height: 20px;
     }
+
+    /* Location Capture Styles */
+    .location-capture { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .location-header-reg { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 600; color: #166534; }
+    .location-header-reg mat-icon { color: #16a34a; }
+    .location-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .search-btn, .location-btn { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; justify-content: center; }
+    .search-btn { border-color: #f59e0b !important; color: #f59e0b !important; }
+    .location-btn { border-color: #16a34a !important; color: #16a34a !important; }
+    .location-captured { margin-top: 12px; }
+    .location-success { display: flex; align-items: center; gap: 8px; color: #16a34a; font-weight: 500; margin-bottom: 12px; }
+    .map-preview { height: 150px; border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+    .map-preview iframe { width: 100%; height: 100%; border: none; }
+    .location-address-text { font-size: 12px; color: #4b5563; margin: 8px 0 0; }
+    .location-error { display: flex; align-items: center; gap: 8px; color: #dc2626; font-size: 13px; margin-top: 8px; }
+
     @media (max-width: 1024px) {
       .auth-container { grid-template-columns: 1fr; }
       .auth-left { display: none; }
@@ -458,15 +475,123 @@ export class RegistrationComponent {
   success = '';
   hidePassword = true;
   currentStep = 1;
+  gettingLocation = false;
+  searchingAddress = false;
+  locationError = '';
+  mapUrl: SafeResourceUrl | null = null;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder, 
+    private authService: AuthService, 
+    private router: Router,
+    private sanitizer: DomSanitizer
+  ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['User', Validators.required],
-      contact_info: ['']
+      contact_info: [''],
+      address: [''],
+      latitude: [null],
+      longitude: [null]
     });
+  }
+
+  getCurrentLocation(): void {
+    if (!navigator.geolocation) {
+      this.locationError = 'Geolocation is not supported by your browser';
+      return;
+    }
+
+    this.gettingLocation = true;
+    this.locationError = '';
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        this.form.patchValue({
+          latitude: lat,
+          longitude: lng
+        });
+
+        // Update map using OpenStreetMap
+        const url = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.005},${lng + 0.005},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`;
+        this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+        // Reverse geocode to get address
+        this.reverseGeocode(lat, lng);
+        this.gettingLocation = false;
+      },
+      (error) => {
+        this.gettingLocation = false;
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            this.locationError = 'Location permission denied. Please enable location access.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            this.locationError = 'Location information unavailable.';
+            break;
+          case error.TIMEOUT:
+            this.locationError = 'Location request timed out.';
+            break;
+          default:
+            this.locationError = 'An error occurred getting your location.';
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }
+
+  reverseGeocode(lat: number, lng: number): void {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.display_name) {
+          this.form.patchValue({ address: data.display_name });
+        }
+      })
+      .catch(() => {});
+  }
+
+  searchAddress(): void {
+    const address = this.form.get('address')?.value;
+    if (!address) {
+      this.locationError = 'Please enter an address first';
+      return;
+    }
+
+    this.searchingAddress = true;
+    this.locationError = '';
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`)
+      .then(res => res.json())
+      .then(data => {
+        this.searchingAddress = false;
+        if (data && data.length > 0) {
+          const result = data[0];
+          const lat = parseFloat(result.lat);
+          const lng = parseFloat(result.lon);
+          
+          this.form.patchValue({
+            latitude: lat,
+            longitude: lng,
+            address: result.display_name
+          });
+
+          // Update map
+          const url = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.005},${lng + 0.005},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`;
+          this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        } else {
+          this.locationError = 'Address not found. Try a more specific address.';
+        }
+      })
+      .catch(() => {
+        this.searchingAddress = false;
+        this.locationError = 'Failed to search address. Please try again.';
+      });
   }
 
   onSubmit(): void {

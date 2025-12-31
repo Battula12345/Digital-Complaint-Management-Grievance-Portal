@@ -12,7 +12,10 @@ router.post('/register', [
   body('name').notEmpty().withMessage('Name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').isIn(['User', 'Staff', 'Admin']).withMessage('Invalid role')
+  body('role').isIn(['User', 'Staff', 'Admin']).withMessage('Invalid role'),
+  body('latitude').optional().isFloat({ min: -90, max: 90 }),
+  body('longitude').optional().isFloat({ min: -180, max: 180 }),
+  body('address').optional().isString()
 ], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -20,7 +23,7 @@ router.post('/register', [
   }
 
   try {
-    const { name, email, password, role, contact_info } = req.body;
+    const { name, email, password, role, contact_info, address, latitude, longitude } = req.body;
     const [existing] = await pool.query<RowDataPacket[]>('SELECT id FROM users WHERE email = ?', [email]);
     
     if (existing.length > 0) {
@@ -29,8 +32,8 @@ router.post('/register', [
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      'INSERT INTO users (name, email, password, role, contact_info) VALUES (?, ?, ?, ?, ?)',
-      [name, email, hashedPassword, role, contact_info || null]
+      'INSERT INTO users (name, email, password, role, contact_info, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, email, hashedPassword, role, contact_info || null, address || null, latitude || null, longitude || null]
     );
 
     res.status(201).json({ message: 'User registered successfully', userId: (result as any).insertId });

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ComplaintService } from '../../services/complaint.service';
 import { Complaint } from '../../models';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-complaint-list',
@@ -97,6 +99,46 @@ import { Complaint } from '../../models';
                 </div>
                 <p>{{ c.resolution_notes }}</p>
               </div>
+
+              <!-- Feedback Section for Resolved Complaints -->
+              <div class="feedback-section" *ngIf="c.status === 'Resolved'">
+                <div *ngIf="c.feedback_rating" class="feedback-submitted">
+                  <div class="feedback-header">
+                    <mat-icon>rate_review</mat-icon> Your Feedback
+                  </div>
+                  <div class="stars-display">
+                    <mat-icon *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= (c.feedback_rating || 0)">
+                      {{ star <= (c.feedback_rating || 0) ? 'star' : 'star_border' }}
+                    </mat-icon>
+                  </div>
+                  <p *ngIf="c.feedback_comment" class="feedback-comment">{{ c.feedback_comment }}</p>
+                </div>
+
+                <div *ngIf="!c.feedback_rating" class="feedback-form">
+                  <div class="feedback-header">
+                    <mat-icon>rate_review</mat-icon> Rate this resolution
+                  </div>
+                  <div class="stars-input">
+                    <mat-icon *ngFor="let star of [1,2,3,4,5]" 
+                      (click)="setRating(c, star)"
+                      [class.filled]="star <= (c.tempRating || 0)">
+                      {{ star <= (c.tempRating || 0) ? 'star' : 'star_border' }}
+                    </mat-icon>
+                  </div>
+                  <mat-form-field appearance="outline" class="feedback-input" *ngIf="c.tempRating">
+                    <mat-label>Comment (optional)</mat-label>
+                    <textarea matInput [(ngModel)]="c.tempComment" rows="2" placeholder="Share your experience..."></textarea>
+                  </mat-form-field>
+                  <button mat-raised-button color="primary" *ngIf="c.tempRating" 
+                    (click)="submitFeedback(c)" [disabled]="c.submittingFeedback" class="submit-feedback-btn">
+                    <mat-spinner *ngIf="c.submittingFeedback" diameter="18"></mat-spinner>
+                    <span *ngIf="!c.submittingFeedback">Submit Feedback</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Chat Section for Assigned/In-Progress Complaints -->
+              <app-chat *ngIf="c.staff_id && c.status !== 'Open'" [complaintId]="c.id"></app-chat>
             </mat-card-content>
 
             <div class="status-timeline">
@@ -115,7 +157,7 @@ import { Complaint } from '../../models';
                 <span>In Progress</span>
               </div>
               <div class="timeline-line" [class.active]="isStatusCompleted(c.status, 'In-progress')"></div>
-              <div class="timeline-step" [class.active]="isStatusActive(c.status, 'Resolved')" [class.completed]="isStatusCompleted(c.status, 'Resolved')">
+              <div class="timeline-step" [class.resolved-active]="isStatusActive(c.status, 'Resolved')" [class.completed]="isStatusCompleted(c.status, 'Resolved')">
                 <div class="step-dot"></div>
                 <span>Resolved</span>
               </div>
@@ -175,10 +217,41 @@ import { Complaint } from '../../models';
     .meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #6b7280; }
     .meta-item mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
-    .resolution-box { background: #ecfdf5; border-radius: 8px; padding: 12px 16px; border-left: 4px solid #10b981; }
+    .resolution-box { background: #ecfdf5; border-radius: 8px; padding: 12px 16px; border-left: 4px solid #10b981; margin-bottom: 16px; }
     .resolution-header { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #047857; font-size: 13px; margin-bottom: 4px; }
     .resolution-header mat-icon { font-size: 16px; width: 16px; height: 16px; }
     .resolution-box p { margin: 0; font-size: 13px; color: #065f46; }
+
+    /* Location Section */
+    .location-section { background: #f0f9ff; border-radius: 8px; overflow: hidden; margin-bottom: 16px; border: 1px solid #bae6fd; }
+    .location-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; cursor: pointer; transition: background 0.2s; }
+    .location-header:hover { background: #e0f2fe; }
+    .location-header mat-icon { color: #0284c7; font-size: 18px; width: 18px; height: 18px; }
+    .location-header span { flex: 1; font-size: 13px; color: #0369a1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .location-header .expand-icon { color: #64748b; }
+    .map-container { padding: 16px; background: #e0f2fe; }
+    .map-info { }
+    .coords-display { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0369a1; margin-bottom: 12px; font-family: monospace; }
+    .coords-display mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    .view-map-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #0284c7; color: white; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s; }
+    .view-map-btn:hover { background: #0369a1; }
+    .view-map-btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+    /* Feedback Styles */
+    .feedback-section { background: #f8fafc; border-radius: 8px; padding: 16px; border: 1px solid #e2e8f0; }
+    .feedback-header { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #475569; font-size: 13px; margin-bottom: 12px; }
+    .feedback-header mat-icon { font-size: 18px; width: 18px; height: 18px; color: #6366f1; }
+    
+    .stars-input, .stars-display { display: flex; gap: 4px; margin-bottom: 12px; }
+    .stars-input mat-icon { cursor: pointer; font-size: 28px; width: 28px; height: 28px; color: #d1d5db; transition: all 0.2s; }
+    .stars-input mat-icon:hover { color: #fbbf24; transform: scale(1.1); }
+    .stars-input mat-icon.filled { color: #f59e0b; }
+    .stars-display mat-icon { font-size: 24px; width: 24px; height: 24px; color: #d1d5db; }
+    .stars-display mat-icon.filled { color: #f59e0b; }
+    
+    .feedback-input { width: 100%; margin-bottom: 8px; }
+    .feedback-comment { font-size: 13px; color: #475569; margin: 0; font-style: italic; }
+    .submit-feedback-btn { min-width: 140px; }
 
     .status-timeline { display: flex; align-items: center; padding: 16px 20px; background: #f9fafb; border-top: 1px solid #e5e7eb; }
     .timeline-step { display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -188,6 +261,8 @@ import { Complaint } from '../../models';
     .timeline-step.active span { color: #6366f1; font-weight: 600; }
     .timeline-step.completed .step-dot { background: #10b981; }
     .timeline-step.completed span { color: #10b981; }
+    .timeline-step.resolved-active .step-dot { background: #10b981; box-shadow: 0 0 0 4px rgba(16,185,129,0.2); }
+    .timeline-step.resolved-active span { color: #10b981; font-weight: 600; }
     .timeline-line { flex: 1; height: 2px; background: #e5e7eb; margin: 0 4px; }
     .timeline-line.active { background: #10b981; }
 
@@ -199,10 +274,14 @@ import { Complaint } from '../../models';
   `]
 })
 export class ComplaintListComponent implements OnInit {
-  complaints: Complaint[] = [];
+  complaints: (Complaint & { tempRating?: number; tempComment?: string; submittingFeedback?: boolean; showMap?: boolean })[] = [];
   loading = true;
 
-  constructor(private complaintService: ComplaintService) {}
+  constructor(
+    private complaintService: ComplaintService, 
+    private snackBar: MatSnackBar,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit(): void {
     this.complaintService.getMyComplaints().subscribe({
@@ -231,5 +310,37 @@ export class ComplaintListComponent implements OnInit {
   isStatusCompleted(current: string, check: string): boolean {
     const order = ['Open', 'Assigned', 'In-progress', 'Resolved'];
     return order.indexOf(current) > order.indexOf(check);
+  }
+
+  setRating(complaint: Complaint & { tempRating?: number }, rating: number): void {
+    complaint.tempRating = rating;
+  }
+
+  toggleMap(complaint: Complaint & { showMap?: boolean }): void {
+    complaint.showMap = !complaint.showMap;
+  }
+
+  getMapUrl(complaint: Complaint): SafeResourceUrl {
+    // Using OpenStreetMap static image
+    const url = `https://staticmap.openstreetmap.de/staticmap.php?center=${complaint.latitude},${complaint.longitude}&zoom=15&size=400x200&markers=${complaint.latitude},${complaint.longitude},red-pushpin`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  submitFeedback(complaint: Complaint & { tempRating?: number; tempComment?: string; submittingFeedback?: boolean }): void {
+    if (!complaint.tempRating) return;
+    
+    complaint.submittingFeedback = true;
+    this.complaintService.submitFeedback(complaint.id, complaint.tempRating, complaint.tempComment).subscribe({
+      next: () => {
+        complaint.feedback_rating = complaint.tempRating;
+        complaint.feedback_comment = complaint.tempComment;
+        complaint.submittingFeedback = false;
+        this.snackBar.open('Thank you for your feedback!', 'Close', { duration: 3000 });
+      },
+      error: () => {
+        complaint.submittingFeedback = false;
+        this.snackBar.open('Failed to submit feedback', 'Close', { duration: 3000 });
+      }
+    });
   }
 }

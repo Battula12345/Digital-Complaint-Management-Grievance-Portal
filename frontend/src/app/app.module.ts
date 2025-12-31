@@ -27,6 +27,9 @@ import { ComplaintDetailsComponent } from './components/complaint-details/compla
 import { StaffDashboardComponent } from './components/staff-dashboard/staff-dashboard.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { ChatComponent } from './components/chat/chat.component';
+import { ChatbotComponent } from './components/chatbot/chatbot.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +41,10 @@ import { UnauthorizedComponent } from './components/unauthorized/unauthorized.co
     ComplaintDetailsComponent,
     StaffDashboardComponent,
     AdminDashboardComponent,
-    UnauthorizedComponent
+    UnauthorizedComponent,
+    ProfileComponent,
+    ChatComponent,
+    ChatbotComponent
   ],
   imports: [
     BrowserModule,

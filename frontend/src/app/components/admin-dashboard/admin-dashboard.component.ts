@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ComplaintService } from '../../services/complaint.service';
-import { Complaint, User, Analytics } from '../../models';
+import { Complaint, User, Analytics, Feedback } from '../../models';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -16,13 +16,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           </div>
         </div>
         <nav class="sidebar-nav">
-          <a class="nav-item active">
+          <a class="nav-item" [class.active]="currentView === 'dashboard'" (click)="currentView = 'dashboard'">
             <mat-icon>home</mat-icon>
             <span>Dashboard</span>
           </a>
-          <a class="nav-item">
+          <a class="nav-item" [class.active]="currentView === 'complaints'" (click)="currentView = 'complaints'">
             <mat-icon>report_problem</mat-icon>
             <span>Complaints</span>
+          </a>
+          <a class="nav-item" [class.active]="currentView === 'feedbacks'" (click)="currentView = 'feedbacks'; loadFeedbacks()">
+            <mat-icon>rate_review</mat-icon>
+            <span>Feedbacks</span>
           </a>
           <a class="nav-item">
             <mat-icon>people</mat-icon>
@@ -48,8 +52,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         <!-- Top Header -->
         <header class="top-header">
           <div class="header-left">
-            <h1>Dashboard Overview</h1>
-            <p>Welcome back! Here's what's happening today.</p>
+            <h1>{{ currentView === 'feedbacks' ? 'User Feedbacks' : 'Dashboard Overview' }}</h1>
+            <p>{{ currentView === 'feedbacks' ? 'View feedback from users on resolved complaints' : 'Welcome back! Here\\'s what\\'s happening today.' }}</p>
           </div>
           <div class="header-right">
             <div class="search-box">
@@ -67,6 +71,54 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           </div>
         </header>
 
+        <!-- Feedbacks View -->
+        <div *ngIf="currentView === 'feedbacks'" class="feedbacks-section">
+          <div *ngIf="loadingFeedbacks" class="loading-state">
+            <mat-spinner diameter="48"></mat-spinner>
+          </div>
+          
+          <div *ngIf="!loadingFeedbacks && feedbacks.length === 0" class="empty-state">
+            <mat-icon>rate_review</mat-icon>
+            <h4>No feedbacks yet</h4>
+            <p>Feedbacks will appear here when users rate resolved complaints</p>
+          </div>
+
+          <div class="feedbacks-grid" *ngIf="!loadingFeedbacks && feedbacks.length > 0">
+            <div class="feedback-card" *ngFor="let f of feedbacks">
+              <div class="feedback-header">
+                <div class="user-info">
+                  <div class="user-avatar" [style.background]="getAvatarColor(f.user_name)">
+                    {{ f.user_name.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ f.user_name }}</span>
+                    <span class="feedback-date">{{ f.created_at | date:'MMM d, y' }}</span>
+                  </div>
+                </div>
+                <div class="rating-stars">
+                  <mat-icon *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= f.rating">
+                    {{ star <= f.rating ? 'star' : 'star_border' }}
+                  </mat-icon>
+                </div>
+              </div>
+              <div class="feedback-body">
+                <div class="complaint-ref">
+                  <mat-icon>description</mat-icon>
+                  <span>{{ f.complaint_title }}</span>
+                </div>
+                <p class="feedback-comment" *ngIf="f.comment">{{ f.comment }}</p>
+                <p class="no-comment" *ngIf="!f.comment">No comment provided</p>
+              </div>
+              <div class="feedback-footer" *ngIf="f.staff_name">
+                <mat-icon>engineering</mat-icon>
+                <span>Resolved by {{ f.staff_name }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <ng-container *ngIf="currentView === 'dashboard' || currentView === 'complaints'">
         <!-- Stats Cards -->
         <div class="stats-grid" *ngIf="analytics">
           <div class="stat-card gradient-blue">
@@ -296,6 +348,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             </div>
           </div>
         </div>
+        </ng-container>
       </main>
     </div>
   `,
@@ -511,15 +564,43 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       .header-right { width: 100%; justify-content: space-between; }
       .filter-chips { flex-wrap: wrap; }
     }
+
+    /* Feedbacks Section */
+    .feedbacks-section { }
+    .feedbacks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+    .feedback-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; }
+    .feedback-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .feedback-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .feedback-header .user-info { display: flex; align-items: center; gap: 12px; }
+    .feedback-header .user-avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 600; }
+    .feedback-header .user-details { display: flex; flex-direction: column; }
+    .feedback-header .user-name { font-size: 15px; font-weight: 600; color: #1e293b; }
+    .feedback-header .feedback-date { font-size: 12px; color: #94a3b8; }
+    .rating-stars { display: flex; gap: 2px; }
+    .rating-stars mat-icon { font-size: 20px; width: 20px; height: 20px; color: #e2e8f0; }
+    .rating-stars mat-icon.filled { color: #f59e0b; }
+    .feedback-body { }
+    .complaint-ref { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 12px; }
+    .complaint-ref mat-icon { font-size: 18px; width: 18px; height: 18px; color: #64748b; }
+    .complaint-ref span { font-size: 13px; color: #475569; font-weight: 500; }
+    .feedback-comment { font-size: 14px; color: #334155; line-height: 1.6; margin: 0; }
+    .no-comment { font-size: 13px; color: #94a3b8; font-style: italic; margin: 0; }
+    .feedback-footer { display: flex; align-items: center; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+    .feedback-footer mat-icon { font-size: 16px; width: 16px; height: 16px; color: #10b981; }
+    .feedback-footer span { font-size: 12px; color: #64748b; }
+    .loading-state { text-align: center; padding: 60px; }
   `]
 })
 export class AdminDashboardComponent implements OnInit {
   complaints: (Complaint & { selectedStaff?: number })[] = [];
   staffList: User[] = [];
   analytics: Analytics | null = null;
+  feedbacks: Feedback[] = [];
   loading = true;
+  loadingFeedbacks = false;
   filter = 'all';
   assigning: number | null = null;
+  currentView: 'dashboard' | 'complaints' | 'feedbacks' = 'dashboard';
 
   constructor(private complaintService: ComplaintService, private snackBar: MatSnackBar) {}
 
@@ -534,6 +615,15 @@ export class AdminDashboardComponent implements OnInit {
     });
     this.complaintService.getStaffList().subscribe(data => this.staffList = data);
     this.complaintService.getAnalytics().subscribe(data => this.analytics = data);
+  }
+
+  loadFeedbacks(): void {
+    if (this.feedbacks.length > 0) return;
+    this.loadingFeedbacks = true;
+    this.complaintService.getAllFeedbacks().subscribe({
+      next: (data) => { this.feedbacks = data; this.loadingFeedbacks = false; },
+      error: () => this.loadingFeedbacks = false
+    });
   }
 
   get filteredComplaints(): (Complaint & { selectedStaff?: number })[] {

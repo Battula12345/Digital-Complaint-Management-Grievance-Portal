@@ -8,12 +8,14 @@ import { ComplaintDetailsComponent } from './components/complaint-details/compla
 import { StaffDashboardComponent } from './components/staff-dashboard/staff-dashboard.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'register', component: RegistrationComponent },
   { path: 'login', component: LoginComponent },
   { path: 'unauthorized', component: UnauthorizedComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard], data: { roles: ['User', 'Staff', 'Admin'] } },
   { path: 'complaints', component: ComplaintListComponent, canActivate: [AuthGuard], data: { roles: ['User'] } },
   { path: 'complaints/new', component: ComplaintDetailsComponent, canActivate: [AuthGuard], data: { roles: ['User'] } },
   { path: 'staff/dashboard', component: StaffDashboardComponent, canActivate: [AuthGuard], data: { roles: ['Staff'] } },

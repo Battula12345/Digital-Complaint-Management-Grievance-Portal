@@ -22,6 +22,8 @@ export interface Complaint {
   status: Status;
   attachments?: string;
   resolution_notes?: string;
+  feedback_rating?: number;
+  feedback_comment?: string;
   created_at: Date;
   updated_at: Date;
 }

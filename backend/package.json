@@ -14,9 +14,12 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
+    "firebase-admin": "^12.0.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
     "mysql2": "^3.6.5",
-    "multer": "^1.4.5-lts.1"
+    "nodemailer": "^7.0.12",
+    "twilio": "^4.23.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -25,8 +28,9 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.10.0",
+    "@types/nodemailer": "^7.0.4",
+    "@types/twilio": "^3.19.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.2"
   }
 }
-  
